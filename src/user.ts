@@ -14,6 +14,10 @@ export function getRegisterEmailValidateCode(
   return tuya.getRegisterEmailValidateCode(params);
 }
 
+export function sendVerifyCodeWithUserName(params: SendVerifyCodeWithUserNameParams): Promise<any> {
+  return tuya.sendVerifyCodeWithUserName(params);
+}
+
 export function loginWithEmail(params: LoginWithEmailParams): Promise<any> {
   return tuya.loginWithEmail(params);
 }
@@ -68,6 +72,13 @@ export type GetEmailValidateCodeParams = {
   countryCode: string;
   email: string;
 };
+
+export type SendVerifyCodeWithUserNameParams = {
+  countryCode: string;
+  email: string;
+  region: string;
+  type: 1 | 2 | 3;
+}
 
 export type LoginWithEmailParams = {
   email: string;

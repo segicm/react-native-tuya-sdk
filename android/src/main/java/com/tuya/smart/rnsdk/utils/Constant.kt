@@ -34,6 +34,7 @@ object Constant {
     const val TOKEN = "token"
     const val FILEPATH = "filePath"
     const val TEMPUNITENUM = "tempUnitEnum"
+    const val REGION = "region"
 
     const val DEVID = "devId"
     const val GROUPID = "groupId"

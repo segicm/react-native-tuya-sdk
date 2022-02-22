@@ -20,11 +20,14 @@ import com.tuya.smart.rnsdk.utils.Constant.TOKEN
 import com.tuya.smart.rnsdk.utils.Constant.UID
 import com.tuya.smart.rnsdk.utils.Constant.USERID
 import com.tuya.smart.rnsdk.utils.Constant.VALIDATECODE
+import com.tuya.smart.rnsdk.utils.Constant.TYPE
+import com.tuya.smart.rnsdk.utils.Constant.REGION
 import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
 import com.tuya.smart.rnsdk.utils.ReactParamsCheck
 import com.tuya.smart.rnsdk.utils.TuyaReactUtils
 import com.tuya.smart.sdk.enums.TempUnitEnum
 import java.io.File
+import com.tuya.smart.sdk.api.IResultCallback
 
 class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -156,6 +159,18 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
                     params.getString(EMAIL),
                     getValidateCodeCallback(promise)
             )
+        }
+    }
+
+    @ReactMethod
+    fun sendVerifyCodeWithUserName(params: ReadableMap, promise: Promise) {
+        if (ReactParamsCheck.checkParams(arrayOf(EMAIL, REGION, COUNTRYCODE, TYPE), params)) {
+            TuyaHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
+                    params.getString(EMAIL),
+                    params.getString(REGION),
+                    params.getString(COUNTRYCODE),
+                    params.getInt(TYPE),
+                    sendVerifyCodeWithUserNameCallback(promise))
         }
     }
 
@@ -348,6 +363,18 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
 
     fun getValidateCodeCallback(promise: Promise): IValidateCallback {
         return object : IValidateCallback {
+            override fun onSuccess() {
+                promise.resolve(Constant.SUCCESS)
+            }
+
+            override fun onError(code: String?, error: String?) {
+                promise.reject(code, error)
+            }
+        }
+    }
+
+    fun sendVerifyCodeWithUserNameCallback(promise: Promise): IResultCallback {
+        return object : IResultCallback {
             override fun onSuccess() {
                 promise.resolve(Constant.SUCCESS)
             }
