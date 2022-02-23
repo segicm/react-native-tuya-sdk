@@ -31,15 +31,25 @@ export function initActivator(
   return tuya.initActivator(params);
 }
 
-export type QRActivatorParams = {
+export type GetActivatorTokenParams = {
   homeId: number;
-  ssid: string;
-  password: string;
+}
+
+export function getActivatorToken(params: GetActivatorTokenParams) {
+  return tuya.getActivatorToken(params);
+}
+
+export type StartQRActivatorParams = {
+  token: string;
   time: number;
 }
 
-export function buildActivatorQR(params: QRActivatorParams) {
-  return tuya.buildActivatorQR(params);
+export function startQRActivator(params: StartQRActivatorParams) {
+  return tuya.startQRActivator(params);
+}
+
+export function stopQRActivator() {
+  return tuya.stopQRActivator();
 }
 
 export function stopConfig() {

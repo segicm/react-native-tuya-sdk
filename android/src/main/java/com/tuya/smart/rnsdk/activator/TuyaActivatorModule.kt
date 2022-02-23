@@ -20,15 +20,12 @@ import com.tuya.smart.rnsdk.utils.Constant.HOMEID
 import com.tuya.smart.rnsdk.utils.Constant.PASSWORD
 import com.tuya.smart.rnsdk.utils.Constant.SSID
 import com.tuya.smart.rnsdk.utils.Constant.TIME
+import com.tuya.smart.rnsdk.utils.Constant.TOKEN
 
 
-import com.tuya.smart.sdk.api.ITuyaActivator
-import com.tuya.smart.sdk.api.ITuyaSmartActivatorListener
-import com.tuya.smart.sdk.api.IMultiModeActivatorListener
 import com.tuya.smart.sdk.bean.DeviceBean
 import com.tuya.smart.sdk.bean.MultiModeActivatorBean
 import com.tuya.smart.sdk.enums.ActivatorModelEnum
-import com.tuya.smart.sdk.api.ITuyaActivatorGetToken
 import com.tuya.smart.home.sdk.builder.TuyaGwSubDevActivatorBuilder
 import com.tuya.smart.rnsdk.utils.Constant.DEVID
 import com.tuya.smart.rnsdk.utils.Constant.TYPE
@@ -40,17 +37,14 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-
-import com.tuya.smart.sdk.api.ITuyaSmartCameraActivatorListener
-
-
-
+import com.tuya.smart.sdk.api.*
 
 
 class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
   var mITuyaActivator: ITuyaActivator? = null
   var mTuyaGWActivator: ITuyaActivator? = null
+  var mTuyaCameraActivator: ITuyaCameraDevActivator? = null
   override fun getName(): String {
     return "TuyaActivatorModule"
   }
@@ -133,56 +127,48 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
 
   }
 
-/*
-* @ReactMethod
-    fun getEmailValidateCode(params: ReadableMap, promise: Promise) {
-        if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL), params)) {
-            TuyaHomeSdk.getUserInstance().getEmailValidateCode(
-                    params.getString(COUNTRYCODE),
-                    params.getString(EMAIL),
-                    getValidateCodeCallback(promise)
-            )
-        }
-    }
-*
-* */
-
   @ReactMethod
-  fun buildActivatorQR(params: ReadableMap, promise: Promise) {
-    if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD, TIME), params)) {
+  fun getActivatorToken(params: ReadableMap, promise: Promise) {
+    if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
       TuyaHomeSdk.getActivatorInstance().getActivatorToken(params.getDouble(HOMEID).toLong(), object : ITuyaActivatorGetToken {
-        override fun onSuccess(token: String) {
-          val cBuilder = TuyaCameraActivatorBuilder()
-            .setToken(token)
-            .setSsid(params.getString(SSID))
-            .setPassword(params.getString(PASSWORD))
-            .setTimeOut(params.getInt(TIME).toLong())
-            .setContext(reactApplicationContext.applicationContext)
-            .setListener(object : ITuyaSmartCameraActivatorListener {
-              override fun onActiveSuccess(devResp: DeviceBean?) {
-
-              }
-
-              override fun onQRCodeSuccess(qrcodeUrl: String?) {
-                promise.resolve(qrcodeUrl);
-              }
-
-              override fun onError(errorCode: String?, errorMsg: String?) {
-                promise.reject(errorCode, errorMsg);
-              }
-            });
-
-          val mTuyaActivator = TuyaHomeSdk.getActivatorInstance().newCameraDevActivator(cBuilder);
-          mTuyaActivator.start();
-          mTuyaActivator.createQRCode();
-
+        override fun onSuccess(token: String?) {
+          promise.resolve(token);
         }
 
-        override fun onFailure(s: String, s1: String) {
-          promise.reject(s, s1)
+        override fun onFailure(errorCode: String?, errorMsg: String?) {
+          promise.reject(errorCode, errorMsg);
         }
       })
     }
+  }
+
+  @ReactMethod
+  fun startQRActivator(params: ReadableMap, promise: Promise) {
+    if (ReactParamsCheck.checkParams(arrayOf(TOKEN, TIME), params)) {
+      val cBuilder = TuyaCameraActivatorBuilder()
+        .setToken(params.getString(TOKEN))
+        .setTimeOut(params.getInt(TIME).toLong())
+        .setContext(reactApplicationContext.applicationContext)
+        .setListener(object : ITuyaSmartCameraActivatorListener {
+          override fun onActiveSuccess(devResp: DeviceBean?) {
+            promise.resolve(TuyaReactUtils.parseToWritableMap(devResp));
+          }
+
+          override fun onQRCodeSuccess(qrcodeUrl: String?) {}
+
+          override fun onError(errorCode: String?, errorMsg: String?) {
+            promise.reject(errorCode, errorMsg);
+          }
+        });
+
+      mTuyaCameraActivator = TuyaHomeSdk.getActivatorInstance().newCameraDevActivator(cBuilder);
+      mTuyaCameraActivator?.start();
+    }
+  }
+
+  @ReactMethod
+  fun stopQRActivator() {
+    mTuyaCameraActivator?.stop();
   }
 
   @ReactMethod
@@ -255,6 +241,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
   fun onDestory() {
     mITuyaActivator?.onDestroy()
     mTuyaGWActivator?.onDestroy()
+    mTuyaCameraActivator?.onDestroy()
   }
 
   fun getITuyaSmartActivatorListener(promise: Promise): ITuyaSmartActivatorListener {
