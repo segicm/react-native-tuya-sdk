@@ -31,6 +31,17 @@ export function initActivator(
   return tuya.initActivator(params);
 }
 
+export type QRActivatorParams = {
+  homeId: number;
+  ssid: string;
+  password: string;
+  time: number;
+}
+
+export function buildActivatorQR(params: QRActivatorParams) {
+  return tuya.buildActivatorQR(params);
+}
+
 export function stopConfig() {
   return tuya.stopConfig();
 }
