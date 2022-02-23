@@ -10,7 +10,7 @@ export type CreateHomeParams = {
   rooms: string[];
 };
 
-export function createHome(params: CreateHomeParams): Promise<string> {
+export function createHome(params: CreateHomeParams): Promise<HomeDetailsResponse> {
   return tuya.createHome(params);
 }
 
