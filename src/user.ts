@@ -48,6 +48,10 @@ export function cancelAccount(): Promise<string> {
   return tuya.cancelAccount();
 }
 
+export async function loginWithUid(params: LoginWithUIDParams): Promise<any> {
+  return tuya.loginWithUid(params);
+}
+
 export type User = {
   email: string;
   username: string;
@@ -92,3 +96,9 @@ export type ResetEmailPasswordParams = {
   validateCode: string;
   newPassword: string;
 };
+
+export type LoginWithUIDParams = {
+  uid: string;
+  password: string;
+  countryCode: string;
+}
