@@ -52,6 +52,10 @@ export async function loginWithUid(params: LoginWithUIDParams): Promise<any> {
   return tuya.loginWithUid(params);
 }
 
+export async function loginOrRegisterWithUid(params: LoginOrRegisterWithUidParams): Promise<any> {
+  return tuya.loginOrRegisterWithUid(params);
+}
+
 export type User = {
   email: string;
   username: string;
@@ -98,6 +102,12 @@ export type ResetEmailPasswordParams = {
 };
 
 export type LoginWithUIDParams = {
+  uid: string;
+  password: string;
+  countryCode: string;
+}
+
+export type LoginOrRegisterWithUidParams = {
   uid: string;
   password: string;
   countryCode: string;
