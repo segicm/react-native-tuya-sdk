@@ -302,6 +302,16 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
         }
     }
 
+    @ReactMethod
+    fun getUser(promise: Promise) {
+        var user = TuyaHomeSdk.getUserInstance().getUser();
+        if (user != null) {
+            promise.resolve(TuyaReactUtils.parseToWritableMap(user))
+        } else {
+            promise.resolve(null)
+        }
+    }
+
 
     /* 上传用户头像*/
     @ReactMethod
