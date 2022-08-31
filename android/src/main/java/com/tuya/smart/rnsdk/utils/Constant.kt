@@ -37,9 +37,9 @@ object Constant {
     const val REGION = "region"
 
     const val UUID = "uuid"
-    const val DEVICE_TYPE = "uuid"
-    const val MAC = "uuid"
-    const val ADDRESS = "uuid"
+    const val DEVICE_TYPE = "deviceType"
+    const val MAC = "mac"
+    const val ADDRESS = "address"
 
     const val DEVID = "devId"
     const val GROUPID = "groupId"
