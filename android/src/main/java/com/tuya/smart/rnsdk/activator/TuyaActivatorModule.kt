@@ -57,7 +57,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
 
   @ReactMethod
   fun startBluetoothScan(promise: Promise) {
-    TuyaHomeSdk.getBleOperator().startLeScan(60000, ScanType.NORMAL
+    TuyaHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
     ) { bean -> promise.resolve(TuyaReactUtils.parseToWritableMap(bean)) };
   }
 
