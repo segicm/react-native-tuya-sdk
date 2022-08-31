@@ -25,6 +25,17 @@ export interface InitBluetoothActivatorParams {
   password: string;
 }
 
+export interface InitBluetoothActivatorFromScanBeanParams {
+  homeId: number;
+  ssid: string;
+  password: string;
+  uuid: string;
+  deviceType: number;
+  mac: string;
+  address: string;
+  token: string;
+}
+
 export function initActivator(
   params: InitActivatorParams
 ): Promise<DeviceDetailResponse> {
@@ -70,6 +81,16 @@ export function initBluetoothDualModeActivator(
     return tuyaBLEActivator.initActivator(params);
   }
   return tuya.initBluetoothDualModeActivator(params);
+}
+
+export function initBluetoothDualModeActivatorFromScanBean(
+  params: InitBluetoothActivatorFromScanBeanParams
+): Promise<DeviceBean> {
+  if (Platform.OS === 'ios') {
+    // TODO
+    return tuyaBLEActivator.initActivator(params);
+  }
+  return tuya.initBluetoothDualModeActivatorFromScanBean(params);
 }
 
 export function getCurrentWifi(
