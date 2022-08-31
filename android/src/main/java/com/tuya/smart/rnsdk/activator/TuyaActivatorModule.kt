@@ -23,6 +23,7 @@ import com.tuya.smart.rnsdk.utils.Constant.TIME
 import com.tuya.smart.rnsdk.utils.Constant.TOKEN
 
 
+
 import com.tuya.smart.sdk.bean.DeviceBean
 import com.tuya.smart.sdk.bean.MultiModeActivatorBean
 import com.tuya.smart.sdk.enums.ActivatorModelEnum
@@ -106,6 +107,63 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
       };
     }
   }
+
+  @ReactMethod
+  fun initBluetoothDualModeActivatorFromScanBean(params: ReadableMap, promise: Promise) {
+//    if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD), params)) {
+//
+//
+//    }
+//    scanResult {"address": "53:33:14:12:1F:D9", "configType": "config_type_wifi", "deviceType": 301, "flag": 1, "id": "da4677070af7ce7e", "isbind": false, "mac": "", "name": "", "productId": "rwn76i4mjcdzu9hf", "providerName": "SingleBleProvider", "uuid": "da4677070af7ce7e"}
+
+    val multiModeActivatorBean = MultiModeActivatorBean();
+    multiModeActivatorBean.ssid = params.getString(SSID);
+    multiModeActivatorBean.pwd = params.getString(PASSWORD);
+
+    multiModeActivatorBean.uuid = params.getString("uuid")
+    multiModeActivatorBean.deviceType = params.getInt("deviceType")
+    multiModeActivatorBean.mac = params.getString("mac")
+    multiModeActivatorBean.address = params.getString("address")
+
+
+    multiModeActivatorBean.homeId = params.getDouble(HOMEID).toLong();
+    multiModeActivatorBean.token = params.getString("token");
+    multiModeActivatorBean.timeout = 180000;
+    multiModeActivatorBean.phase1Timeout = 60000;
+
+    TuyaHomeSdk.getActivator().newMultiModeActivator()
+      .startActivator(multiModeActivatorBean, object : IMultiModeActivatorListener {
+        override fun onSuccess(bean: DeviceBean) {
+          promise.resolve(TuyaReactUtils.parseToWritableMap(bean));
+        }
+
+        override fun onFailure(code: Int, msg: String?, handle: Any?) {
+          promise.reject(code.toString(), msg);
+        }
+      });
+  }
+
+//  @ReactMethod
+//  fun initActivatorDeviceInfo(params: ReadableMap, promise: Promise) {
+//    if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD), params)) {
+//
+//      TuyaHomeSdk.getActivatorInstance().getActivatorDeviceInfo(
+//        scanDeviceBean.getProductId(),
+//        scanDeviceBean.getUuid(),
+//        scanDeviceBean.getMac(),
+//        object : ITuyaDataCallback<ConfigProductInfoBean?>() {
+//          @Override
+//          fun onSuccess(result: ConfigProductInfoBean?) {
+//            promise.resolve(TuyaReactUtils.parseToWritableMap(bean));
+//          }
+//
+//          @Override
+//          fun onError(errorCode: String?, errorMessage: String?) {
+//            promise.reject(code.toString(), msg);
+//          }
+//        })
+//    }
+//  }
 
 
   @ReactMethod
