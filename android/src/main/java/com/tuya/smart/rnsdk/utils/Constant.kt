@@ -36,6 +36,11 @@ object Constant {
     const val TEMPUNITENUM = "tempUnitEnum"
     const val REGION = "region"
 
+    const val UUID = "uuid"
+    const val DEVICE_TYPE = "uuid"
+    const val MAC = "uuid"
+    const val ADDRESS = "uuid"
+
     const val DEVID = "devId"
     const val GROUPID = "groupId"
     const val MESHID = "meshId"
