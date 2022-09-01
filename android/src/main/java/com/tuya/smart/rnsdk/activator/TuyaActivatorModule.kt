@@ -2,45 +2,33 @@ package com.tuya.smart.rnsdk.activator
 
 import android.content.Intent
 import android.provider.Settings
-import android.util.Log
 import com.facebook.react.bridge.*
-import com.tuya.smart.android.common.utils.WiFiUtil
-
-import com.tuya.smart.android.ble.api.TyBleScanResponse
 import com.tuya.smart.android.ble.api.ScanType
-import com.tuya.smart.android.ble.api.ScanType.SINGLE
-import com.tuya.smart.android.ble.api.ScanDeviceBean
-import com.tuya.smart.android.ble.api.LeScanSetting
-import com.tuya.smart.android.ble.api.LeScanSetting.Builder
-
+import com.tuya.smart.android.common.utils.WiFiUtil
 import com.tuya.smart.home.sdk.TuyaHomeSdk
 import com.tuya.smart.home.sdk.builder.ActivatorBuilder
-import com.tuya.smart.rnsdk.utils.*
+import com.tuya.smart.home.sdk.builder.TuyaCameraActivatorBuilder
+import com.tuya.smart.home.sdk.builder.TuyaGwSubDevActivatorBuilder
+import com.tuya.smart.rnsdk.utils.Constant.ADDRESS
+import com.tuya.smart.rnsdk.utils.Constant.DEVICE_TYPE
+import com.tuya.smart.rnsdk.utils.Constant.DEVID
 import com.tuya.smart.rnsdk.utils.Constant.HOMEID
+import com.tuya.smart.rnsdk.utils.Constant.MAC
 import com.tuya.smart.rnsdk.utils.Constant.PASSWORD
 import com.tuya.smart.rnsdk.utils.Constant.SSID
 import com.tuya.smart.rnsdk.utils.Constant.TIME
 import com.tuya.smart.rnsdk.utils.Constant.TOKEN
-
-
+import com.tuya.smart.rnsdk.utils.Constant.TYPE
+import com.tuya.smart.rnsdk.utils.Constant.UUID
+import com.tuya.smart.rnsdk.utils.ReactParamsCheck
+import com.tuya.smart.rnsdk.utils.TuyaReactUtils
+import com.tuya.smart.sdk.api.*
 import com.tuya.smart.sdk.bean.DeviceBean
 import com.tuya.smart.sdk.bean.MultiModeActivatorBean
 import com.tuya.smart.sdk.enums.ActivatorModelEnum
-import com.tuya.smart.home.sdk.builder.TuyaGwSubDevActivatorBuilder
-import com.tuya.smart.rnsdk.utils.Constant.DEVID
-import com.tuya.smart.rnsdk.utils.Constant.TYPE
-import com.facebook.react.bridge.Promise
 
-import com.facebook.react.bridge.ReactMethod
-import com.tuya.smart.home.sdk.builder.TuyaCameraActivatorBuilder
-import com.facebook.react.modules.core.DeviceEventManagerModule
-
-import com.facebook.react.bridge.WritableMap
-import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import com.tuya.smart.sdk.api.*
-
-
-class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class TuyaActivatorModule(reactContext: ReactApplicationContext) :
+  ReactContextBaseJavaModule(reactContext) {
 
   var mITuyaActivator: ITuyaActivator? = null
   var mTuyaGWActivator: ITuyaActivator? = null
@@ -51,7 +39,8 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
 
   @ReactMethod
   fun startBluetoothScan(promise: Promise) {
-    TuyaHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
+    TuyaHomeSdk.getBleOperator().startLeScan(
+      60000, ScanType.SINGLE
     ) { bean -> promise.resolve(TuyaReactUtils.parseToWritableMap(bean)) };
   }
 
@@ -65,7 +54,8 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
   fun initBluetoothDualModeActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD), params)) {
 
-      TuyaHomeSdk.getBleOperator().startLeScan(60000, ScanType.SINGLE
+      TuyaHomeSdk.getBleOperator().startLeScan(
+        60000, ScanType.SINGLE
       ) { bean ->
         params.getDouble(HOMEID).toLong().let {
           TuyaHomeSdk.getActivatorInstance()
@@ -107,10 +97,56 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
     }
   }
 
+  @ReactMethod
+  fun initBluetoothDualModeActivatorFromScanBean(params: ReadableMap, promise: Promise) {
+
+    if (ReactParamsCheck.checkParams(
+        arrayOf(
+          HOMEID,
+          SSID,
+          PASSWORD,
+          TOKEN,
+          UUID,
+          ADDRESS,
+          MAC,
+          DEVICE_TYPE
+        ), params
+      )
+    ) {
+
+      val multiModeActivatorBean = MultiModeActivatorBean();
+      multiModeActivatorBean.ssid = params.getString(SSID);
+      multiModeActivatorBean.pwd = params.getString(PASSWORD);
+
+      multiModeActivatorBean.uuid = params.getString(UUID)
+      multiModeActivatorBean.deviceType = params.getInt(DEVICE_TYPE)
+      multiModeActivatorBean.mac = params.getString(MAC)
+      multiModeActivatorBean.address = params.getString(ADDRESS)
+
+
+      multiModeActivatorBean.homeId = params.getDouble(HOMEID).toLong();
+      multiModeActivatorBean.token = params.getString(TOKEN);
+      multiModeActivatorBean.timeout = 180000;
+      multiModeActivatorBean.phase1Timeout = 60000;
+
+      TuyaHomeSdk.getActivator().newMultiModeActivator()
+        .startActivator(multiModeActivatorBean, object : IMultiModeActivatorListener {
+          override fun onSuccess(bean: DeviceBean) {
+            promise.resolve(TuyaReactUtils.parseToWritableMap(bean));
+          }
+
+          override fun onFailure(code: Int, msg: String?, handle: Any?) {
+            promise.reject(code.toString(), msg);
+          }
+        });
+    }
+  }
 
   @ReactMethod
-  fun getCurrentWifi(params: ReadableMap, successCallback: Callback,
-                     errorCallback: Callback) {
+  fun getCurrentWifi(
+    params: ReadableMap, successCallback: Callback,
+    errorCallback: Callback
+  ) {
     successCallback.invoke(WiFiUtil.getCurrentSSID(reactApplicationContext.applicationContext));
   }
 
@@ -130,15 +166,16 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
   @ReactMethod
   fun getActivatorToken(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
-      TuyaHomeSdk.getActivatorInstance().getActivatorToken(params.getDouble(HOMEID).toLong(), object : ITuyaActivatorGetToken {
-        override fun onSuccess(token: String?) {
-          promise.resolve(token);
-        }
+      TuyaHomeSdk.getActivatorInstance()
+        .getActivatorToken(params.getDouble(HOMEID).toLong(), object : ITuyaActivatorGetToken {
+          override fun onSuccess(token: String?) {
+            promise.resolve(token);
+          }
 
-        override fun onFailure(errorCode: String?, errorMsg: String?) {
-          promise.reject(errorCode, errorMsg);
-        }
-      })
+          override fun onFailure(errorCode: String?, errorMsg: String?) {
+            promise.reject(errorCode, errorMsg);
+          }
+        })
     }
   }
 
@@ -174,23 +211,26 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) : ReactContextB
   @ReactMethod
   fun initActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD, TIME, TYPE), params)) {
-      TuyaHomeSdk.getActivatorInstance().getActivatorToken(params.getDouble(HOMEID)?.toLong(), object : ITuyaActivatorGetToken {
-        override fun onSuccess(token: String) {
-          mITuyaActivator = TuyaHomeSdk.getActivatorInstance().newActivator(ActivatorBuilder()
-            .setSsid(params.getString(SSID))
-            .setContext(reactApplicationContext.applicationContext)
-            .setPassword(params.getString(PASSWORD))
-            .setActivatorModel(ActivatorModelEnum.valueOf(params.getString(TYPE) as String))
-            .setTimeOut(params.getInt(TIME).toLong())
-            .setToken(token).setListener(getITuyaSmartActivatorListener(promise)))
-          mITuyaActivator?.start()
-        }
+      TuyaHomeSdk.getActivatorInstance()
+        .getActivatorToken(params.getDouble(HOMEID)?.toLong(), object : ITuyaActivatorGetToken {
+          override fun onSuccess(token: String) {
+            mITuyaActivator = TuyaHomeSdk.getActivatorInstance().newActivator(
+              ActivatorBuilder()
+                .setSsid(params.getString(SSID))
+                .setContext(reactApplicationContext.applicationContext)
+                .setPassword(params.getString(PASSWORD))
+                .setActivatorModel(ActivatorModelEnum.valueOf(params.getString(TYPE) as String))
+                .setTimeOut(params.getInt(TIME).toLong())
+                .setToken(token).setListener(getITuyaSmartActivatorListener(promise))
+            )
+            mITuyaActivator?.start()
+          }
 
 
-        override fun onFailure(s: String, s1: String) {
-          promise.reject(s, s1)
-        }
-      })
+          override fun onFailure(s: String, s1: String) {
+            promise.reject(s, s1)
+          }
+        })
     }
 
   }
