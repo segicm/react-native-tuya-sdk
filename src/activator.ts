@@ -39,6 +39,7 @@ export interface InitBluetoothActivatorFromScanBeanParams {
   mac: string;
   address: string;
   token: string;
+  timeout: number;
 }
 
 export function initActivator(
@@ -96,6 +97,22 @@ export function initBluetoothDualModeActivatorFromScanBean(
     return tuyaBLEActivator.initActivator(params);
   }
   return tuya.initBluetoothDualModeActivatorFromScanBean(params);
+}
+
+export function stopLeScan() {
+  if (Platform.OS === 'ios') {
+    // TODO
+    return;
+  }
+  return tuya.stopBluetoothScan();
+}
+
+export function stopLePairing() {
+  if (Platform.OS === 'ios') {
+    // TODO
+    return;
+  }
+  return tuya.stopLeActivation();
 }
 
 export function getCurrentWifi(
