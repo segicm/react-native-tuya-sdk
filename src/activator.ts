@@ -62,6 +62,9 @@ export type GetActivatorTokenParams = {
 }
 
 export function getActivatorToken(params: GetActivatorTokenParams) {
+  if (Platform.OS === 'ios') {
+    return;
+  }
   return tuya.getActivatorToken(params);
 }
 
@@ -116,7 +119,7 @@ export function stopLeScan() {
 
 export function stopLePairing() {
   if (Platform.OS === 'ios') {
-    return tuyaBLEScanner.stopLePairing();
+    return tuyaBLEActivator.stopLePairing();
   }
   return tuya.stopLeActivation();
 }
