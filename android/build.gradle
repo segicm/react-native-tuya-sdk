@@ -4,7 +4,7 @@ apply plugin: 'maven-publish'
 
 
 buildscript {
-    ext.kotlin_version = '1.6.0'
+    ext.kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : '1.6.0'
     repositories {
 
         maven{url 'https://maven.aliyun.com/nexus/content/groups/public/'}
