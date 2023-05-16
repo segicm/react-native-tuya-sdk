@@ -48,6 +48,8 @@
 
 /* Begin PBXFileReference section */
 		134814201AA4EA6300B7C361 /* libRNTuyaSdk.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTuyaSdk.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		628A99EE2A11090E00641CFD /* BLEScanner */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BLEScanner; sourceTree = "<group>"; };
+		628A99EF2A11090E00641CFD /* BLEActivator */ = {isa = PBXFileReference; lastKnownFileType = folder; path = BLEActivator; sourceTree = "<group>"; };
 		93D1D51123FE9628007D33C0 /* TuyaRNActivatorModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TuyaRNActivatorModule.h; sourceTree = "<group>"; };
 		93D1D51223FE9628007D33C0 /* TuyaRNActivatorModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TuyaRNActivatorModule.m; sourceTree = "<group>"; };
 		93D1D51423FE9628007D33C0 /* TuyaRNHomeManagerModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TuyaRNHomeManagerModule.h; sourceTree = "<group>"; };
@@ -130,6 +132,8 @@
 		93D1D50F23FE9628007D33C0 /* RNTuyaSdk */ = {
 			isa = PBXGroup;
 			children = (
+				628A99EF2A11090E00641CFD /* BLEActivator */,
+				628A99EE2A11090E00641CFD /* BLEScanner */,
 				93D1D51023FE9628007D33C0 /* Activator */,
 				93D1D51323FE9628007D33C0 /* Home */,
 				93D1D51C23FE9628007D33C0 /* ShareDevice */,

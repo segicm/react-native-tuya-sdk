@@ -50,7 +50,7 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
   NSString *password = params[kTuyaRNActivatorModulePassword];
   NSNumber *time = params[kTuyaRNActivatorModuleOverTime];
   NSString *type = params[kTuyaRNActivatorModuleActivatorMode];
-//  NSString *token = params[kTuyaRNActivatorModuleActivatorToken];
+  NSString *token = params[kTuyaRNActivatorModuleAcccessToken];
 
   TYActivatorMode mode =  TYActivatorModeEZ;
   if ([type isEqualToString:@"TY_EZ"]) {
@@ -69,12 +69,16 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
   activatorInstance.promiseResolveBlock = resolver;
   activatorInstance.promiseRejectBlock = rejecter;
 
-  [[TuyaSmartActivator sharedInstance] getTokenWithHomeId:homeId.longLongValue success:^(NSString *result) {
-    //开始配置网络：
-    [[TuyaSmartActivator sharedInstance] startConfigWiFi:mode ssid:ssid password:password token:result timeout:time.doubleValue];
-  } failure:^(NSError *error) {
-    [TuyaRNUtils rejecterWithError:error handler:rejecter];
-  }];
+    if (token == nil){
+        [[TuyaSmartActivator sharedInstance] getTokenWithHomeId:homeId.longLongValue success:^(NSString *result) {
+            //开始配置网络：
+            [[TuyaSmartActivator sharedInstance] startConfigWiFi:mode ssid:ssid password:password token:result timeout:time.doubleValue];
+        } failure:^(NSError *error) {
+            [TuyaRNUtils rejecterWithError:error handler:rejecter];
+        }];
+    } else {
+        [[TuyaSmartActivator sharedInstance] startConfigWiFi:mode ssid:ssid password:password token:token timeout:time.doubleValue];
+    }
 }
 
 
@@ -150,5 +154,14 @@ RCT_EXPORT_METHOD(onDestory:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromis
     self.promiseResolveBlock([deviceModel yy_modelToJSONObject]);
   }
 }
+
+RCT_EXPORT_METHOD(getActivatorToken:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
+    NSNumber *homeId = params[kTuyaRNActivatorModuleHomeId];
+
+    [[TuyaSmartActivator sharedInstance] getTokenWithHomeId:homeId.longLongValue success:^(NSString *result) {
+        resolver(result);
+    } failure:^(NSError *error) {
+      [TuyaRNUtils rejecterWithError:error handler:rejecter];
+    }];}
 
 @end

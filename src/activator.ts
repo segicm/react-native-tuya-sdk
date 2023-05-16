@@ -27,7 +27,13 @@ export interface InitBluetoothActivatorParams {
 
 export interface StartLeScanParams {
   timeout: number;
-  scanType: 'SINGLE' | 'SINGLE_QR' | 'MESH' | 'SIG_MESH' | 'NORMAL' | 'TY_BEACON';
+  scanType:
+    | 'SINGLE'
+    | 'SINGLE_QR'
+    | 'MESH'
+    | 'SIG_MESH'
+    | 'NORMAL'
+    | 'TY_BEACON';
 }
 
 type IOSBLEActivatorParams = {
@@ -49,7 +55,9 @@ type AndroidBLEActivatorParams = {
   address: string;
   token: string;
 };
-export type InitBluetoothActivatorFromScanBeanParams = IOSBLEActivatorParams | AndroidBLEActivatorParams;
+export type InitBluetoothActivatorFromScanBeanParams =
+  | IOSBLEActivatorParams
+  | AndroidBLEActivatorParams;
 
 export function initActivator(
   params: InitActivatorParams
@@ -59,25 +67,28 @@ export function initActivator(
 
 export type GetActivatorTokenParams = {
   homeId: number;
-}
+};
 
 export function getActivatorToken(params: GetActivatorTokenParams) {
-  if (Platform.OS === 'ios') {
-    return;
-  }
   return tuya.getActivatorToken(params);
 }
 
 export type StartQRActivatorParams = {
   token: string;
   time: number;
-}
+};
 
 export function startQRActivator(params: StartQRActivatorParams) {
+  if (Platform.OS === 'ios') {
+    return tuya.initActivator({ ...params, type: 'TY_QR' });
+  }
   return tuya.startQRActivator(params);
 }
 
 export function stopQRActivator() {
+  if (Platform.OS === 'ios') {
+    return stopConfig();
+  }
   return tuya.stopQRActivator();
 }
 
