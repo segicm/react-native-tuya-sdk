@@ -78,7 +78,7 @@ export type StartQRActivatorParams = {
   time: number;
 };
 
-export function startQRActivator(params: StartQRActivatorParams) {
+export function startQRActivator(params: StartQRActivatorParams): Promise<DeviceDetailResponse> {
   if (Platform.OS === 'ios') {
     return tuya.initActivator({ ...params, type: 'TY_QR' });
   }
