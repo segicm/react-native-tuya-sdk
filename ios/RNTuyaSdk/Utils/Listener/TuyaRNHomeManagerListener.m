@@ -9,9 +9,9 @@
 #import "TuyaRNHomeManagerListener.h"
 #import "TuyaRNEventEmitter.h"
 
-@interface TuyaRNHomeManagerListener()<TuyaSmartHomeManagerDelegate>
+@interface TuyaRNHomeManagerListener()<ThingSmartHomeManagerDelegate>
 
-@property (nonatomic, strong) TuyaSmartHomeManager *currentSmartHomeManager;
+@property (nonatomic, strong) ThingSmartHomeManager *currentSmartHomeManager;
 
 @end
 
@@ -27,7 +27,7 @@
 }
 
 //注册家庭管理监听：
-- (void)registerSmartHomeManager:(TuyaSmartHomeManager *)homeManager {
+- (void)registerSmartHomeManager:(ThingSmartHomeManager *)homeManager {
   if (!homeManager) {
     return;
   }
@@ -43,8 +43,8 @@
 #pragma mark -
 #pragma mark - TuyaSmartHomeManagerDelegate
 // 添加一个家庭
-- (void)homeManager:(TuyaSmartHomeManager *)manager didAddHome:(TuyaSmartHomeModel *)home {
-  
+- (void)homeManager:(ThingSmartHomeManager *)manager didAddHome:(ThingSmartHomeModel *)home {
+
   long long homeId = home.homeId;
   if (!(homeId > 0)) {
     return;
@@ -57,8 +57,8 @@
 }
 
 // 删除一个家庭
-- (void)homeManager:(TuyaSmartHomeManager *)manager didRemoveHome:(long long)homeId {
-  
+- (void)homeManager:(ThingSmartHomeManager *)manager didRemoveHome:(long long)homeId {
+
   if (!(homeId > 0)) {
     return;
   }
@@ -67,7 +67,7 @@
                         @"type": @"onHomeRemoved"
                         };
   [TuyaRNEventEmitter ty_sendEvent:[kTYEventEmitterHomeChangeEvent stringByAppendingString:@"//"] withBody:dic];
-  
+
 }
 
 // MQTT连接成功

@@ -7,10 +7,10 @@
 //
 
 #import "TuyaBLERNScannerModule.h"
-#import <TuyaSmartActivatorKit/TuyaSmartActivatorKit.h>
-#import <TuyaSmartBaseKit/TuyaSmartBaseKit.h>
-#import <TuyaSmartDeviceKit/TuyaSmartDeviceKit.h>
-#import <TuyaSmartBLEKit/TuyaSmartBLEManager+Biz.h>
+#import <ThingSmartActivatorKit/ThingSmartActivatorKit.h>
+#import <ThingSmartBaseKit/ThingSmartBaseKit.h>
+#import <ThingSmartDeviceKit/ThingSmartDeviceKit.h>
+#import <ThingSmartBLEKit/ThingSmartBLEManager+Biz.h>
 #import "TuyaRNUtils+Network.h"
 #import "YYModel.h"
 #import "TuyaEventSender.h"
@@ -18,7 +18,7 @@
 // Bluetooth Pairing
 static TuyaBLERNScannerModule * scannerInstance = nil;
 
-@interface TuyaBLERNScannerModule()<TuyaSmartBLEManagerDelegate>
+@interface TuyaBLERNScannerModule()<ThingSmartBLEManagerDelegate>
 
 @property(copy, nonatomic) RCTPromiseResolveBlock promiseResolveBlock;
 @property(copy, nonatomic) RCTPromiseRejectBlock promiseRejectBlock;
@@ -34,14 +34,14 @@ RCT_EXPORT_METHOD(startBluetoothScan:(RCTPromiseResolveBlock)resolver rejecter:(
     scannerInstance = [TuyaBLERNScannerModule new];
   }
 
-  [TuyaSmartBLEManager sharedInstance].delegate = scannerInstance;
+  [ThingSmartBLEManager sharedInstance].delegate = scannerInstance;
   scannerInstance.promiseResolveBlock = resolver;
   scannerInstance.promiseRejectBlock = rejecter;
 
-  [[TuyaSmartBLEManager sharedInstance] startListening:YES];
+  [[ThingSmartBLEManager sharedInstance] startListening:YES];
 }
 
-- (void)didDiscoveryDeviceWithDeviceInfo:(TYBLEAdvModel *)deviceInfo {
+- (void)didDiscoveryDeviceWithDeviceInfo:(ThingBLEAdvModel *)deviceInfo {
   TuyaEventSender * eventSender = [TuyaEventSender allocWithZone: nil];
   [eventSender sendEvent2RN:tuyaEventSenderScanLEEvent body:[deviceInfo yy_modelToJSONObject]];
 
@@ -54,13 +54,13 @@ RCT_EXPORT_METHOD(startBluetoothLEScan:(RCTPromiseResolveBlock)resolver rejecter
   if (scannerInstance == nil) {
     scannerInstance = [TuyaBLERNScannerModule new];
   }
-  [TuyaSmartBLEManager sharedInstance].delegate = scannerInstance;
-  [[TuyaSmartBLEManager sharedInstance] startListening:YES];
+  [ThingSmartBLEManager sharedInstance].delegate = scannerInstance;
+  [[ThingSmartBLEManager sharedInstance] startListening:YES];
   resolver(@"true");
 }
 
 RCT_EXPORT_METHOD(stopBluetoothScan:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-  [[TuyaSmartBLEManager sharedInstance] stopListening:YES];
+  [[ThingSmartBLEManager sharedInstance] stopListening:YES];
 }
 
 @end
