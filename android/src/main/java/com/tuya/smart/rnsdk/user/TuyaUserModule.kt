@@ -1,9 +1,14 @@
 package com.tuya.smart.rnsdk.user
 
 import com.facebook.react.bridge.*
-import com.tuya.smart.android.user.api.*
-import com.tuya.smart.android.user.bean.User
-import com.tuya.smart.home.sdk.TuyaHomeSdk
+import com.thingclips.smart.android.user.bean.User
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.android.user.api.ILogoutCallback
+import com.thingclips.smart.android.user.api.ILoginCallback
+import com.thingclips.smart.android.user.api.IRegisterCallback
+import com.thingclips.smart.android.user.api.IResetPasswordCallback
+import com.thingclips.smart.android.user.api.IValidateCallback
+import com.thingclips.smart.android.user.api.IBooleanCallback
 import com.tuya.smart.rnsdk.utils.Constant
 import com.tuya.smart.rnsdk.utils.Constant.ACCESSTOKEN
 import com.tuya.smart.rnsdk.utils.Constant.CODE
@@ -25,9 +30,9 @@ import com.tuya.smart.rnsdk.utils.Constant.REGION
 import com.tuya.smart.rnsdk.utils.Constant.getIResultCallback
 import com.tuya.smart.rnsdk.utils.ReactParamsCheck
 import com.tuya.smart.rnsdk.utils.TuyaReactUtils
-import com.tuya.smart.sdk.enums.TempUnitEnum
+import com.thingclips.smart.sdk.enums.TempUnitEnum
 import java.io.File
-import com.tuya.smart.sdk.api.IResultCallback
+import com.thingclips.smart.sdk.api.IResultCallback
 
 class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
@@ -38,20 +43,20 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     /* 检测是否要升级用户数据 */
     @ReactMethod
     fun checkVersionUpgrade(promise: Promise) {
-        promise.resolve(TuyaHomeSdk.getUserInstance().checkVersionUpgrade())
+        promise.resolve(ThingHomeSdk.getUserInstance().checkVersionUpgrade())
     }
 
     /* 升级账号 */
     @ReactMethod
     fun upgradeVersion(promise: Promise) {
-        TuyaHomeSdk.getUserInstance().upgradeVersion(getIResultCallback(promise))
+        ThingHomeSdk.getUserInstance().upgradeVersion(getIResultCallback(promise))
     }
 
     /* 获取手机验证码 */
     @ReactMethod
     fun getValidateCode(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER), params)) {
-            TuyaHomeSdk.getUserInstance().getValidateCode(
+            ThingHomeSdk.getUserInstance().getValidateCode(
                     params.getString(COUNTRYCODE),
                     params.getString(PHONENUMBER),
                     getValidateCodeCallback(promise)
@@ -63,7 +68,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginWithValidateCode(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER, VALIDATECODE), params)) {
-            TuyaHomeSdk.getUserInstance().loginWithPhone(
+            ThingHomeSdk.getUserInstance().loginWithPhone(
                     params.getString(COUNTRYCODE),
                     params.getString(PHONENUMBER),
                     params.getString(VALIDATECODE),
@@ -75,7 +80,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun registerAccountWithPhone(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER, PASSWORD, VALIDATECODE), params)) {
-            TuyaHomeSdk.getUserInstance().registerAccountWithPhone(
+            ThingHomeSdk.getUserInstance().registerAccountWithPhone(
                     params.getString(COUNTRYCODE),
                     params.getString(PHONENUMBER),
                     params.getString(PASSWORD),
@@ -89,7 +94,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginWithPhonePassword(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER, PASSWORD), params)) {
-            TuyaHomeSdk.getUserInstance().loginWithPhonePassword(
+            ThingHomeSdk.getUserInstance().loginWithPhonePassword(
                     params.getString(COUNTRYCODE),
                     params.getString(PHONENUMBER),
                     params.getString(PASSWORD),
@@ -101,7 +106,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun resetPhonePassword(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, PHONENUMBER, CODE, NEWPASSWORD), params)) {
-            TuyaHomeSdk.getUserInstance().resetPhonePassword(
+            ThingHomeSdk.getUserInstance().resetPhonePassword(
                     params.getString(COUNTRYCODE),
                     params.getString(PHONENUMBER),
                     params.getString(CODE),
@@ -114,7 +119,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun getRegisterEmailValidateCode(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL), params)) {
-            TuyaHomeSdk.getUserInstance().getRegisterEmailValidateCode(
+            ThingHomeSdk.getUserInstance().getRegisterEmailValidateCode(
                     params.getString(COUNTRYCODE),
                     params.getString(EMAIL),
                     getIResultCallback(promise)
@@ -127,7 +132,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun registerAccountWithEmail(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL, PASSWORD, VALIDATECODE), params)) {
-            TuyaHomeSdk.getUserInstance().registerAccountWithEmail(
+            ThingHomeSdk.getUserInstance().registerAccountWithEmail(
                     params.getString(COUNTRYCODE),
                     params.getString(EMAIL),
                     params.getString(PASSWORD),
@@ -141,7 +146,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginWithEmail(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL, PASSWORD), params)) {
-            TuyaHomeSdk.getUserInstance().loginWithEmail(
+            ThingHomeSdk.getUserInstance().loginWithEmail(
                     params.getString(COUNTRYCODE),
                     params.getString(EMAIL),
                     params.getString(PASSWORD),
@@ -154,7 +159,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun getEmailValidateCode(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL), params)) {
-            TuyaHomeSdk.getUserInstance().getEmailValidateCode(
+            ThingHomeSdk.getUserInstance().getEmailValidateCode(
                     params.getString(COUNTRYCODE),
                     params.getString(EMAIL),
                     getValidateCodeCallback(promise)
@@ -165,7 +170,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun sendVerifyCodeWithUserName(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(EMAIL, REGION, COUNTRYCODE, TYPE), params)) {
-            TuyaHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
+            ThingHomeSdk.getUserInstance().sendVerifyCodeWithUserName(
                     params.getString(EMAIL),
                     params.getString(REGION),
                     params.getString(COUNTRYCODE),
@@ -178,7 +183,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun resetEmailPassword(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, EMAIL, VALIDATECODE, NEWPASSWORD), params)) {
-            TuyaHomeSdk.getUserInstance().resetEmailPassword(
+            ThingHomeSdk.getUserInstance().resetEmailPassword(
                     params.getString(COUNTRYCODE),
                     params.getString(EMAIL),
                     params.getString(VALIDATECODE),
@@ -191,7 +196,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     /* logout */
     @ReactMethod
     fun logout(promise: Promise) {
-        TuyaHomeSdk.getUserInstance().logout(object : ILogoutCallback {
+        ThingHomeSdk.getUserInstance().logout(object : ILogoutCallback {
             override fun onSuccess() {
                 promise.resolve(Constant.SUCCESS)
             }
@@ -206,14 +211,14 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     /* 注销账户 */
     @ReactMethod
     fun cancelAccount(promise: Promise) {
-        TuyaHomeSdk.getUserInstance().cancelAccount(getIResultCallback(promise))
+        ThingHomeSdk.getUserInstance().cancelAccount(getIResultCallback(promise))
     }
 
     /* 用户uid注册*/
     @ReactMethod
     fun registerAccountWithUid(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, UID, PASSWORD), params)) {
-            TuyaHomeSdk.getUserInstance().registerAccountWithUid(
+            ThingHomeSdk.getUserInstance().registerAccountWithUid(
                     params.getString(COUNTRYCODE),
                     params.getString(UID),
                     params.getString(PASSWORD),
@@ -225,7 +230,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginWithUid(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, UID, PASSWORD), params)) {
-            TuyaHomeSdk.getUserInstance().loginWithUid(
+            ThingHomeSdk.getUserInstance().loginWithUid(
                     params.getString(COUNTRYCODE),
                     params.getString(UID),
                     params.getString(PASSWORD),
@@ -237,7 +242,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginOrRegisterWithUid(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, UID, PASSWORD), params)) {
-            TuyaHomeSdk.getUserInstance().loginOrRegisterWithUid(
+            ThingHomeSdk.getUserInstance().loginOrRegisterWithUid(
                     params.getString(COUNTRYCODE),
                     params.getString(UID),
                     params.getString(PASSWORD),
@@ -250,7 +255,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginByTwitter(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, KEY, SECRET), params)) {
-            TuyaHomeSdk.getUserInstance().loginByTwitter(
+            ThingHomeSdk.getUserInstance().loginByTwitter(
                     params.getString(COUNTRYCODE),
                     params.getString(KEY),
                     params.getString(SECRET),
@@ -263,7 +268,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginByQQ(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, USERID, ACCESSTOKEN), params)) {
-            TuyaHomeSdk.getUserInstance().loginByQQ(
+            ThingHomeSdk.getUserInstance().loginByQQ(
                     params.getString(COUNTRYCODE),
                     params.getString(USERID),
                     params.getString(ACCESSTOKEN),
@@ -275,7 +280,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginByWechat(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, CODE), params)) {
-            TuyaHomeSdk.getUserInstance().loginByWechat(
+            ThingHomeSdk.getUserInstance().loginByWechat(
                     params.getString(COUNTRYCODE),
                     params.getString(CODE),
                     getLoginCallback(promise))
@@ -286,7 +291,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun loginByFacebook(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(COUNTRYCODE, TOKEN), params)) {
-            TuyaHomeSdk.getUserInstance().loginByFacebook(
+            ThingHomeSdk.getUserInstance().loginByFacebook(
                     params.getString(COUNTRYCODE),
                     params.getString(TOKEN),
                     getLoginCallback(promise))
@@ -295,8 +300,8 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
 
     @ReactMethod
     fun getCurrentUser(promise: Promise) {
-        if (TuyaHomeSdk.getUserInstance().user != null) {
-            promise.resolve(TuyaReactUtils.parseToWritableMap(TuyaHomeSdk.getUserInstance().user))
+        if (ThingHomeSdk.getUserInstance().user != null) {
+            promise.resolve(TuyaReactUtils.parseToWritableMap(ThingHomeSdk.getUserInstance().user))
         } else {
             promise.resolve(null)
         }
@@ -304,7 +309,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
 
     @ReactMethod
     fun getUser(promise: Promise) {
-        var user = TuyaHomeSdk.getUserInstance().getUser();
+        var user = ThingHomeSdk.getUserInstance().getUser();
         if (user != null) {
             promise.resolve(TuyaReactUtils.parseToWritableMap(user))
         } else {
@@ -317,7 +322,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun uploadUserAvatar(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(FILEPATH), params)) {
-            TuyaHomeSdk.getUserInstance().uploadUserAvatar(
+            ThingHomeSdk.getUserInstance().uploadUserAvatar(
                     File(params.getString(FILEPATH)), getIBooleanCallback(promise))
         }
     }
@@ -326,7 +331,7 @@ class TuyaUserModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
     @ReactMethod
     fun setTempUnit(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(TEMPUNITENUM), params)) {
-            TuyaHomeSdk.getUserInstance().setTempUnit(TempUnitEnum.valueOf(params.getString(TEMPUNITENUM) as String), getIResultCallback(promise))
+            ThingHomeSdk.getUserInstance().setTempUnit(TempUnitEnum.valueOf(params.getString(TEMPUNITENUM) as String), getIResultCallback(promise))
         }
     }
 

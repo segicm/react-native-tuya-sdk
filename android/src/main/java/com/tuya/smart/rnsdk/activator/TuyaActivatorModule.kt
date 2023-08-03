@@ -4,12 +4,12 @@ import android.content.Intent
 import android.provider.Settings
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import com.tuya.smart.android.ble.api.ScanType
-import com.tuya.smart.android.common.utils.WiFiUtil
-import com.tuya.smart.home.sdk.TuyaHomeSdk
-import com.tuya.smart.home.sdk.builder.ActivatorBuilder
-import com.tuya.smart.home.sdk.builder.TuyaCameraActivatorBuilder
-import com.tuya.smart.home.sdk.builder.TuyaGwSubDevActivatorBuilder
+import com.thingclips.smart.android.ble.api.ScanType
+import com.thingclips.smart.android.common.utils.WiFiUtil
+import com.thingclips.smart.home.sdk.ThingHomeSdk
+import com.thingclips.smart.home.sdk.builder.ActivatorBuilder
+import com.thingclips.smart.home.sdk.builder.ThingCameraActivatorBuilder
+import com.thingclips.smart.home.sdk.builder.ThingGwSubDevActivatorBuilder
 import com.tuya.smart.rnsdk.utils.Constant.ADDRESS
 import com.tuya.smart.rnsdk.utils.Constant.DEVICE_TYPE
 import com.tuya.smart.rnsdk.utils.Constant.DEVID
@@ -25,19 +25,24 @@ import com.tuya.smart.rnsdk.utils.Constant.TYPE
 import com.tuya.smart.rnsdk.utils.Constant.UUID
 import com.tuya.smart.rnsdk.utils.ReactParamsCheck
 import com.tuya.smart.rnsdk.utils.TuyaReactUtils
-import com.tuya.smart.sdk.api.*
-import com.tuya.smart.sdk.bean.DeviceBean
-import com.tuya.smart.sdk.bean.MultiModeActivatorBean
-import com.tuya.smart.sdk.enums.ActivatorModelEnum
+import com.thingclips.smart.sdk.bean.DeviceBean
+import com.thingclips.smart.sdk.bean.MultiModeActivatorBean
+import com.thingclips.smart.sdk.enums.ActivatorModelEnum
+import com.thingclips.smart.sdk.api.IThingActivator
+import com.thingclips.smart.sdk.api.IThingCameraDevActivator
+import com.thingclips.smart.sdk.api.IThingActivatorGetToken
+import com.thingclips.smart.sdk.api.IMultiModeActivatorListener
+import com.thingclips.smart.sdk.api.IThingSmartCameraActivatorListener
+import com.thingclips.smart.sdk.api.IThingSmartActivatorListener
 import android.util.Log
 
 
 class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
 
-  var mITuyaActivator: ITuyaActivator? = null
-  var mTuyaGWActivator: ITuyaActivator? = null
-  var mTuyaCameraActivator: ITuyaCameraDevActivator? = null
+  var mIThingActivator: IThingActivator? = null
+  var mTuyaGWActivator: IThingActivator? = null
+  var mTuyaCameraActivator: IThingCameraDevActivator? = null
   var leActivatorUUID: String? = null
 
   override fun getName(): String {
@@ -51,7 +56,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun startBluetoothScan(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(TIMEOUT, SCAN_TYPE), params)) {
-      TuyaHomeSdk.getBleOperator().startLeScan(
+      ThingHomeSdk.getBleOperator().startLeScan(
         params.getInt(TIMEOUT), params.getString(SCAN_TYPE)?.let { ScanType.valueOf(it) }
       ) { bean ->
         this.reactApplicationContext.getJSModule(RCTDeviceEventEmitter::class.java).emit(
@@ -64,7 +69,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun stopBluetoothScan() {
-    TuyaHomeSdk.getBleOperator().stopLeScan();
+    ThingHomeSdk.getBleOperator().stopLeScan();
   }
 
 
@@ -72,12 +77,12 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   fun initBluetoothDualModeActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD), params)) {
 
-      TuyaHomeSdk.getBleOperator().startLeScan(
+      ThingHomeSdk.getBleOperator().startLeScan(
         60000, ScanType.SINGLE
       ) { bean ->
         params.getDouble(HOMEID).toLong().let {
-          TuyaHomeSdk.getActivatorInstance()
-            .getActivatorToken(it, object : ITuyaActivatorGetToken {
+          ThingHomeSdk.getActivatorInstance()
+            .getActivatorToken(it, object : IThingActivatorGetToken {
               override fun onSuccess(token: String) {
                 val multiModeActivatorBean = MultiModeActivatorBean();
                 multiModeActivatorBean.ssid = params.getString(SSID);
@@ -94,7 +99,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
                 multiModeActivatorBean.timeout = 180000;
                 multiModeActivatorBean.phase1Timeout = 60000;
 
-                TuyaHomeSdk.getActivator().newMultiModeActivator()
+                ThingHomeSdk.getActivator().newMultiModeActivator()
                   .startActivator(multiModeActivatorBean, object : IMultiModeActivatorListener {
                     override fun onSuccess(bean: DeviceBean) {
                       promise.resolve(TuyaReactUtils.parseToWritableMap(bean));
@@ -149,7 +154,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
       multiModeActivatorBean.phase1Timeout = 60000;
 
       leActivatorUUID = params.getString(UUID);
-      TuyaHomeSdk.getActivator().newMultiModeActivator()
+      ThingHomeSdk.getActivator().newMultiModeActivator()
         .startActivator(multiModeActivatorBean, object : IMultiModeActivatorListener {
           override fun onSuccess(bean: DeviceBean) {
             promise.resolve(TuyaReactUtils.parseToWritableMap(bean));
@@ -166,7 +171,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun stopLeActivation() {
     if (leActivatorUUID != null) {
-      TuyaHomeSdk.getBleManager().stopBleConfig(leActivatorUUID)
+      ThingHomeSdk.getBleManager().stopBleConfig(leActivatorUUID)
     }
   }
 
@@ -194,8 +199,8 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun getActivatorToken(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID), params)) {
-      TuyaHomeSdk.getActivatorInstance()
-        .getActivatorToken(params.getDouble(HOMEID).toLong(), object : ITuyaActivatorGetToken {
+      ThingHomeSdk.getActivatorInstance()
+        .getActivatorToken(params.getDouble(HOMEID).toLong(), object : IThingActivatorGetToken {
           override fun onSuccess(token: String?) {
             promise.resolve(token);
           }
@@ -210,11 +215,11 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun startQRActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(TOKEN, TIME), params)) {
-      val cBuilder = TuyaCameraActivatorBuilder()
+      val cBuilder = ThingCameraActivatorBuilder()
         .setToken(params.getString(TOKEN))
         .setTimeOut(params.getInt(TIME).toLong())
         .setContext(reactApplicationContext.applicationContext)
-        .setListener(object : ITuyaSmartCameraActivatorListener {
+        .setListener(object : IThingSmartCameraActivatorListener {
           override fun onActiveSuccess(devResp: DeviceBean?) {
             promise.resolve(TuyaReactUtils.parseToWritableMap(devResp));
           }
@@ -226,7 +231,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
           }
         });
 
-      mTuyaCameraActivator = TuyaHomeSdk.getActivatorInstance().newCameraDevActivator(cBuilder);
+      mTuyaCameraActivator = ThingHomeSdk.getActivatorInstance().newCameraDevActivator(cBuilder);
       mTuyaCameraActivator?.start();
     }
   }
@@ -239,19 +244,19 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun initActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD, TIME, TYPE), params)) {
-      TuyaHomeSdk.getActivatorInstance()
-        .getActivatorToken(params.getDouble(HOMEID).toLong(), object : ITuyaActivatorGetToken {
+      ThingHomeSdk.getActivatorInstance()
+        .getActivatorToken(params.getDouble(HOMEID).toLong(), object : IThingActivatorGetToken {
           override fun onSuccess(token: String) {
-            mITuyaActivator = TuyaHomeSdk.getActivatorInstance().newActivator(
+            mIThingActivator = ThingHomeSdk.getActivatorInstance().newActivator(
               ActivatorBuilder()
                 .setSsid(params.getString(SSID))
                 .setContext(reactApplicationContext.applicationContext)
                 .setPassword(params.getString(PASSWORD))
                 .setActivatorModel(ActivatorModelEnum.valueOf(params.getString(TYPE) as String))
                 .setTimeOut(params.getInt(TIME).toLong())
-                .setToken(token).setListener(getITuyaSmartActivatorListener(promise))
+                .setToken(token).setListener(getIThingSmartActivatorListener(promise))
             )
-            mITuyaActivator?.start()
+            mIThingActivator?.start()
           }
 
 
@@ -269,12 +274,12 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun newGwSubDevActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(DEVID, TIME), params)) {
-      val builder = TuyaGwSubDevActivatorBuilder()
+      val builder = ThingGwSubDevActivatorBuilder()
         //设置网关ID
         .setDevId(params.getString(DEVID))
         //设置配网超时时间
         .setTimeOut(params.getInt(TIME).toLong())
-        .setListener(object : ITuyaSmartActivatorListener {
+        .setListener(object : IThingSmartActivatorListener {
           override fun onError(var1: String, var2: String) {
             promise.reject(var1, var2)
           }
@@ -295,25 +300,25 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
           }
         })
 
-      mTuyaGWActivator = TuyaHomeSdk.getActivatorInstance().newGwSubDevActivator(builder)
+      mTuyaGWActivator = ThingHomeSdk.getActivatorInstance().newGwSubDevActivator(builder)
     }
   }
 
   @ReactMethod
   fun stopConfig() {
-    mITuyaActivator?.stop()
+    mIThingActivator?.stop()
     mTuyaGWActivator?.stop()
   }
 
   @ReactMethod
   fun onDestory() {
-    mITuyaActivator?.onDestroy()
+    mIThingActivator?.onDestroy()
     mTuyaGWActivator?.onDestroy()
     mTuyaCameraActivator?.onDestroy()
   }
 
-  fun getITuyaSmartActivatorListener(promise: Promise): ITuyaSmartActivatorListener {
-    return object : ITuyaSmartActivatorListener {
+  fun getIThingSmartActivatorListener(promise: Promise): IThingSmartActivatorListener {
+    return object : IThingSmartActivatorListener {
       /**
        * 1001        网络错误
       1002        配网设备激活接口调用失败，接口调用不成功
