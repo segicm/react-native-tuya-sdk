@@ -8,10 +8,10 @@
 
 #import "TuyaBLERNActivatorModule.h"
 #import <React/RCTBridgeModule.h>
-#import <TuyaSmartActivatorKit/TuyaSmartActivatorKit.h>
-#import <TuyaSmartBaseKit/TuyaSmartBaseKit.h>
-#import <TuyaSmartDeviceKit/TuyaSmartDeviceKit.h>
-#import <TuyaSmartBLEKit/TuyaSmartBLEWifiActivator.h>
+#import <ThingSmartActivatorKit/ThingSmartActivatorKit.h>
+#import <ThingSmartBaseKit/ThingSmartBaseKit.h>
+#import <ThingSmartDeviceKit/ThingSmartDeviceKit.h>
+#import <ThingSmartBLEKit/ThingSmartBLEWifiActivator.h>
 #import "TuyaRNUtils+Network.h"
 #import "YYModel.h"
 
@@ -25,7 +25,7 @@
 // Bluetooth Pairing
 static TuyaBLERNActivatorModule * activatorInstance = nil;
 
-@interface TuyaBLERNActivatorModule()<TuyaSmartBLEWifiActivatorDelegate>
+@interface TuyaBLERNActivatorModule()<ThingSmartBLEWifiActivatorDelegate>
 
 @property(copy, nonatomic) RCTPromiseResolveBlock promiseResolveBlock;
 @property(copy, nonatomic) RCTPromiseRejectBlock promiseRejectBlock;
@@ -41,7 +41,7 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
     activatorInstance = [TuyaBLERNActivatorModule new];
   }
 
-  [TuyaSmartBLEWifiActivator sharedInstance].bleWifiDelegate = activatorInstance;
+  [ThingSmartBLEWifiActivator sharedInstance].bleWifiDelegate = activatorInstance;
   activatorInstance.promiseResolveBlock = resolver;
   activatorInstance.promiseRejectBlock = rejecter;
 
@@ -54,7 +54,7 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
   long long int homeIdValue = [homeId longLongValue];
   int timeoutValue = [timeout intValue] / 1000;
 
-  [[TuyaSmartBLEWifiActivator sharedInstance] startConfigBLEWifiDeviceWithUUID:deviceId homeId:homeIdValue productId:productId ssid:ssid password:password  timeout:timeoutValue success:^{
+  [[ThingSmartBLEWifiActivator sharedInstance] startConfigBLEWifiDeviceWithUUID:deviceId homeId:homeIdValue productId:productId ssid:ssid password:password  timeout:timeoutValue success:^{
       // Wait for activation
     } failure:^ {
       if (activatorInstance.promiseRejectBlock) {
@@ -64,7 +64,7 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
     }];
 }
 
-- (void)bleWifiActivator:(TuyaSmartBLEWifiActivator *)activator didReceiveBLEWifiConfigDevice:(TuyaSmartDeviceModel *)deviceModel error:(NSError *)error {
+- (void)bleWifiActivator:(ThingSmartBLEWifiActivator *)activator didReceiveBLEWifiConfigDevice:(ThingSmartDeviceModel *)deviceModel error:(NSError *)error {
   if (!error && deviceModel) {
     if (activatorInstance.promiseResolveBlock) {
       self.promiseResolveBlock([deviceModel yy_modelToJSONObject]);
@@ -75,11 +75,11 @@ RCT_EXPORT_METHOD(initActivator:(NSDictionary *)params resolver:(RCTPromiseResol
       [TuyaRNUtils rejecterWithError:error handler:activatorInstance.promiseRejectBlock];
     }
   }
-  [[TuyaSmartBLEWifiActivator sharedInstance] stopDiscover];
+  [[ThingSmartBLEWifiActivator sharedInstance] stopDiscover];
 }
 
 RCT_EXPORT_METHOD(stopLePairing) {
-  [[TuyaSmartBLEWifiActivator sharedInstance] stopDiscover];
+  [[ThingSmartBLEWifiActivator sharedInstance] stopDiscover];
 }
 
 @end
