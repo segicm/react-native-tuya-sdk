@@ -244,6 +244,15 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun initActivator(params: ReadableMap, promise: Promise) {
     if (ReactParamsCheck.checkParams(arrayOf(HOMEID, SSID, PASSWORD, TIME, TYPE), params)) {
+      var mode = when (params.getString(TYPE)) {
+          "TY_EZ" -> ActivatorModelEnum.THING_EZ
+          "TY_AP" -> ActivatorModelEnum.THING_AP
+          "TY_QR" -> ActivatorModelEnum.THING_QR
+          else -> { // Note the block
+            promise.reject(this.name, "wrong activation type")
+            return;
+          }
+      }
       ThingHomeSdk.getActivatorInstance()
         .getActivatorToken(params.getDouble(HOMEID).toLong(), object : IThingActivatorGetToken {
           override fun onSuccess(token: String) {
@@ -252,7 +261,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
                 .setSsid(params.getString(SSID))
                 .setContext(reactApplicationContext.applicationContext)
                 .setPassword(params.getString(PASSWORD))
-                .setActivatorModel(ActivatorModelEnum.valueOf(params.getString(TYPE) as String))
+                .setActivatorModel(mode)
                 .setTimeOut(params.getInt(TIME).toLong())
                 .setToken(token).setListener(getIThingSmartActivatorListener(promise))
             )
@@ -343,6 +352,7 @@ class TuyaActivatorModule(reactContext: ReactApplicationContext) :
       device_bind_success 设备绑定成功，但还未上线，此时设备处于离线状态，无法控制设备。
        */
       override fun onStep(var1: String, var2: Any) {
+        Log.i("TuyaActivatorModule", "onStep $var1 $var2")
         // IOS 没有onStep保持一致
         //promise.reject(var1,"")
       }

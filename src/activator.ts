@@ -10,12 +10,18 @@ export function openNetworkSettings() {
   return tuya.openNetworkSettings({});
 }
 
+export enum TuyaActivationType {
+  EZ = 'TY_EZ',
+  AP = 'TY_AP',
+  QR = 'TY_QR',
+}
+
 export type InitActivatorParams = {
   homeId: number;
   ssid: string;
   password: string;
   time: number;
-  type: 'TY_EZ' | 'TY_AP' | 'TY_QR';
+  type: TuyaActivationType;
 };
 
 export interface InitBluetoothActivatorParams {
