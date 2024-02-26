@@ -16,6 +16,6 @@ Pod::Spec.new do |s|
   s.source_files  = "ios/**/*.{h,m}"
 
   s.dependency 'React'
-  s.dependency 'ThingSmartHomeKit'
+  s.dependency 'ThingSmartHomeKit', '~> 5.8.0', :source => 'https://github.com/tuya/tuya-pod-specs.git'
   s.dependency 'YYModel'
 end
