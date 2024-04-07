@@ -1,5 +1,5 @@
 import { NativeModules } from 'react-native';
-import { DeviceDps } from './device';
+import { DeviceDps } from 'device';
 
 const tuya = NativeModules.TuyaHomeModule;
 
@@ -22,6 +22,16 @@ export function queryRoomList(
 export type GetHomeDetailParams = {
   homeId: number;
 };
+export type DeviceSchemaItem = {
+  id: number;
+  code: string;
+  name: string;
+  extContent: string;
+  type: 'obj' | 'raw';
+  schemaType: 'bool' | 'value' | 'enum' | 'string';
+  property: string;
+  mode: string;
+};
 export type DeviceDetailResponse = {
   homeId: number;
   isOnline: boolean;
@@ -32,6 +42,11 @@ export type DeviceDetailResponse = {
   dps: DeviceDps;
   homeDisplayOrder: number;
   roomId: number;
+  mac: string;
+  ip: string;
+  uuid: string;
+  timezoneId: string;
+  schemaMap: Record<number, DeviceSchemaItem>;
 };
 export type GetHomeDetailResponse = {
   deviceList: DeviceDetailResponse[];
