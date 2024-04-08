@@ -1,6 +1,7 @@
 export * from './activator';
 export * from './bridgeUtils';
 export * from './device';
+export * from './deviceSubscriptions';
 export * from './home';
 export * from './homeDataManager';
 export * from './homeManager';
