@@ -1,4 +1,4 @@
-import { NativeModules } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 import { DeviceDps } from 'device';
 
 const tuya = NativeModules.TuyaHomeModule;
@@ -56,10 +56,32 @@ export type GetHomeDetailResponse = {
   sharedGroupList: any[];
 };
 
-export function getHomeDetail(
+export async function getHomeDetail (
   params: GetHomeDetailParams
 ): Promise<GetHomeDetailResponse> {
-  return tuya.getHomeDetail(params);
+  const homeDetails = await tuya.getHomeDetail(params);
+
+  /*
+  * On iOS home devices list has differences in structure, soo need to make it same as on android
+  * */
+  if (Platform.OS === 'ios' && homeDetails.deviceList) {
+    const deviceList = homeDetails.deviceList?.map((i: DeviceDetailResponse & { schema: string}) => {
+      const schema = JSON.parse(i.schema) as Array<DeviceSchemaItem>;
+      const schemaMap = schema.reduce((acc, item) => {
+        return {
+          ...acc,
+          [item.id]: item,
+        };
+      }, {});
+      return {
+        ...i,
+        schemaMap,
+      };
+    });
+
+    return { ...homeDetails, deviceList }
+  }
+  return homeDetails;
 }
 
 export type UpdateHomeParams = {
