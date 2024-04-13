@@ -21,7 +21,10 @@ type TDeviceListenerOptions = {
   type: DeviceListenerType;
 }
 export const addDeviceListener = ({ devId, type}: TDeviceListenerOptions, cb: (data: unknown) => void) => {
-  tuya.registerDevListener({ devId });
+  if (!subscriptions[devId]) {
+    tuya.registerDevListener({ devId });
+    subscriptions[devId] = 0;
+  }
   const sub = addEvent(bridge(DEVLISTENER, devId), data => {
     if (data.type === type) {
       cb(data);
@@ -32,7 +35,7 @@ export const addDeviceListener = ({ devId, type}: TDeviceListenerOptions, cb: (d
   return {
     remove: () => {
       sub.remove();
-      if (subscriptions[devId] === 1) {
+      if (subscriptions[devId] <= 1) {
         tuya.unRegisterDevListener({ devId });
       }
       subscriptions[devId]--;
