@@ -1,5 +1,6 @@
 import { NativeModules, EmitterSubscription } from 'react-native';
 import { addEvent, bridge, DEVLISTENER } from './bridgeUtils';
+import { DeviceSchemaItem } from 'home'
 
 const tuya = NativeModules.TuyaDeviceModule;
 
@@ -9,10 +10,17 @@ export type DeviceBean = {
   verSw: string;
   name: string;
   dps: DeviceDps;
-  uuid?: string;
   deviceType?: number;
-  mac?: string;
   address?: string;
+  homeId: number;
+  isOnline: boolean;
+  homeDisplayOrder: number;
+  roomId: number;
+  mac: string;
+  ip: string;
+  uuid: string;
+  timezoneId: string;
+  schemaMap: Record<number, DeviceSchemaItem>;
 };
 
 export type DevListenerParams = {

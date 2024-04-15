@@ -1,5 +1,6 @@
 import { NativeModules, Platform } from 'react-native';
 import { DeviceDps } from 'device';
+import { prepareDeviceBean } from './bridgeUtils'
 
 const tuya = NativeModules.TuyaHomeModule;
 
@@ -66,17 +67,7 @@ export async function getHomeDetail (
   * */
   if (Platform.OS === 'ios' && homeDetails.deviceList) {
     const deviceList = homeDetails.deviceList?.map((i: DeviceDetailResponse & { schema: string}) => {
-      const schema = JSON.parse(i.schema) as Array<DeviceSchemaItem>;
-      const schemaMap = schema.reduce((acc, item) => {
-        return {
-          ...acc,
-          [item.id]: item,
-        };
-      }, {});
-      return {
-        ...i,
-        schemaMap,
-      };
+      return prepareDeviceBean(i);
     });
 
     return { ...homeDetails, deviceList }

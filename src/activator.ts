@@ -1,6 +1,7 @@
 import { DeviceBean } from 'device';
 import { NativeModules, Platform } from 'react-native';
-import { DeviceDetailResponse } from 'home';
+import { DeviceDetailResponse } from './home';
+import { prepareDeviceBean } from './bridgeUtils'
 
 const tuya = NativeModules.TuyaActivatorModule;
 const tuyaBLEActivator = NativeModules.TuyaBLEActivatorModule;
@@ -65,9 +66,13 @@ export type InitBluetoothActivatorFromScanBeanParams =
   | IOSBLEActivatorParams
   | AndroidBLEActivatorParams;
 
-export function initActivator(
+export async function initActivator(
   params: InitActivatorParams
 ): Promise<DeviceDetailResponse> {
+  if (Platform.OS === 'ios') {
+    const device = await tuya.initActivator(params);
+    return prepareDeviceBean(device);
+  }
   return tuya.initActivator(params);
 }
 
@@ -84,9 +89,10 @@ export type StartQRActivatorParams = {
   time: number;
 };
 
-export function startQRActivator(params: StartQRActivatorParams): Promise<DeviceDetailResponse> {
+export async function startQRActivator(params: StartQRActivatorParams): Promise<DeviceDetailResponse> {
   if (Platform.OS === 'ios') {
-    return tuya.initActivator({ ...params, type: 'TY_QR' });
+    const device = await tuya.initActivator({ ...params, type: 'TY_QR' });
+    return prepareDeviceBean(device);
   }
   return tuya.startQRActivator(params);
 }
@@ -109,20 +115,22 @@ export function startBluetoothScan(params: StartLeScanParams) {
   return tuya.startBluetoothScan(params);
 }
 
-export function initBluetoothDualModeActivator(
+export async function initBluetoothDualModeActivator(
   params: InitBluetoothActivatorParams
 ): Promise<DeviceBean> {
   if (Platform.OS === 'ios') {
-    return tuyaBLEActivator.initActivator(params);
+    const device = await tuyaBLEActivator.initActivator(params);
+    return prepareDeviceBean(device);
   }
   return tuya.initBluetoothDualModeActivator(params);
 }
 
-export function initBluetoothDualModeActivatorFromScanBean(
+export async function initBluetoothDualModeActivatorFromScanBean(
   params: InitBluetoothActivatorFromScanBeanParams
 ): Promise<DeviceBean> {
   if (Platform.OS === 'ios') {
-    return tuyaBLEActivator.initActivator(params);
+    const device = await tuyaBLEActivator.initActivator(params);
+    return prepareDeviceBean(device);
   }
   return tuya.initBluetoothDualModeActivatorFromScanBean(params);
 }
