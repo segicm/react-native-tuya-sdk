@@ -48,6 +48,17 @@ export type DeviceDetailResponse = {
   uuid: string;
   timezoneId: string;
   schemaMap: Record<number, DeviceSchemaItem>;
+  productBean: {
+    bluetooth: boolean;
+    id: string;
+    productKey: string;
+    productVer: string;
+    schemaInfo: {
+      dpCodeSchemaMap: Record<string, DeviceSchemaItem>;
+    };
+    supportGroup: boolean;
+    wifi: boolean;
+  }
 };
 export type GetHomeDetailResponse = {
   deviceList: DeviceDetailResponse[];
