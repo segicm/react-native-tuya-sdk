@@ -35,7 +35,10 @@ object TuyaReactUtils {
                         // Long型支持，如果数字大于int, 且是整数,转化成long
                         if (value > Integer.MAX_VALUE && value % 1 == 0.0) {
                             deconstructedMap[key] = value.toLong()
-                        } else {
+                        } else if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE && value % 1 == 0.0) {
+                            // If the number is a whole number and within the range of an integer, cast it to an integer
+                            deconstructedMap[key] = value.toInt()
+                        } else  {
                             deconstructedMap[key] = value
                         }
                     } catch (e: Exception) {
