@@ -1,5 +1,6 @@
-import { NativeModules } from 'react-native';
-import { DeviceDps } from './device';
+import { NativeModules, Platform } from 'react-native';
+import { DeviceDps } from 'device';
+import { prepareDeviceBean } from './bridgeUtils'
 
 const tuya = NativeModules.TuyaHomeModule;
 
@@ -22,6 +23,16 @@ export function queryRoomList(
 export type GetHomeDetailParams = {
   homeId: number;
 };
+export type DeviceSchemaItem = {
+  id: number;
+  code: string;
+  name: string;
+  extContent: string;
+  type: 'obj' | 'raw';
+  schemaType: 'bool' | 'value' | 'enum' | 'string';
+  property: string;
+  mode: string;
+};
 export type DeviceDetailResponse = {
   homeId: number;
   isOnline: boolean;
@@ -32,6 +43,11 @@ export type DeviceDetailResponse = {
   dps: DeviceDps;
   homeDisplayOrder: number;
   roomId: number;
+  mac: string;
+  ip: string;
+  uuid: string;
+  timezoneId: string;
+  schemaMap: Record<number, DeviceSchemaItem>;
 };
 export type GetHomeDetailResponse = {
   deviceList: DeviceDetailResponse[];
@@ -41,10 +57,22 @@ export type GetHomeDetailResponse = {
   sharedGroupList: any[];
 };
 
-export function getHomeDetail(
+export async function getHomeDetail (
   params: GetHomeDetailParams
 ): Promise<GetHomeDetailResponse> {
-  return tuya.getHomeDetail(params);
+  const homeDetails = await tuya.getHomeDetail(params);
+
+  /*
+  * On iOS home devices list has differences in structure, soo need to make it same as on android
+  * */
+  if (Platform.OS === 'ios' && homeDetails.deviceList) {
+    const deviceList = homeDetails.deviceList?.map((i: DeviceDetailResponse & { schema: string}) => {
+      return prepareDeviceBean(i);
+    });
+
+    return { ...homeDetails, deviceList }
+  }
+  return homeDetails;
 }
 
 export type UpdateHomeParams = {
