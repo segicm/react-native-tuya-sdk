@@ -32,10 +32,13 @@ RCT_EXPORT_MODULE(TuyaDeviceModule)
  设备监听开启
  */
 RCT_EXPORT_METHOD(registerDevListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
-
-  self.smartDevice  = [self smartDeviceWithParams:params];
-  //监听设备
-  [TuyaRNDeviceListener registerDevice:self.smartDevice type:TuyaRNDeviceListenType_DeviceInfo];
+ThingSmartDevice *d = [self smartDeviceWithParams:params];
+  if (d == nil) {
+      rejecter(@"cannot add device listener", @"devId is nil or not exist", nil);
+  } else {
+      //监听设备
+      [TuyaRNDeviceListener registerDevice:d type:TuyaRNDeviceListenType_DeviceInfo];
+  }
 }
 
 /**

@@ -1,6 +1,6 @@
 import { NativeModules, EmitterSubscription } from 'react-native';
 import { addEvent, bridge, DEVLISTENER } from './bridgeUtils';
-import { DeviceSchemaItem } from 'home'
+import { DeviceSchemaItem } from './home';
 
 const tuya = NativeModules.TuyaDeviceModule;
 
@@ -22,15 +22,9 @@ export type DeviceBean = {
   timezoneId: string;
   schemaMap: Record<number, DeviceSchemaItem>;
   productBean: {
-    bluetooth: boolean;
-    id: string;
-    productKey: string;
-    productVer: string;
     schemaInfo: {
       dpCodeSchemaMap: Record<string, DeviceSchemaItem>;
     };
-    supportGroup: boolean;
-    wifi: boolean;
   }
 };
 

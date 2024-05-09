@@ -20,16 +20,21 @@ export const bridge = (key: string, id: string | number) => `${key}//${id}`;
 /*
  * On iOS home devices list has differences in structure, soo need to make it same as on android
  * */
-export const prepareDeviceBean = (device: DeviceBean & { schema: string}) => {
+export const prepareDeviceBean = (device: DeviceBean & { schema: string; }) => {
   const schema = JSON.parse(device.schema) as Array<DeviceSchemaItem>;
-  const schemaMap = schema.reduce((acc, item) => {
-    return {
-      ...acc,
-      [item.id]: item,
-    };
-  }, {});
+  const schemaMap: Record<string, DeviceSchemaItem> = {};
+  const dpCodeSchemaMap: Record<string, DeviceSchemaItem> = {};
+  schema.forEach((item) => {
+    schemaMap[item.id] = item;
+    dpCodeSchemaMap[item.code] = item;
+  });
   return {
     ...device,
     schemaMap,
+    productBean: {
+      schemaInfo: {
+        dpCodeSchemaMap,
+      },
+    }
   };
 };
