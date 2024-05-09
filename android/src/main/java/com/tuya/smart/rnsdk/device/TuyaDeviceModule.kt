@@ -45,7 +45,7 @@ class TuyaDeviceModule(reactContext: ReactApplicationContext) : ReactContextBase
     }
 
     @ReactMethod
-    fun registerDevListener(params: ReadableMap) {
+    fun registerDevListener(params: ReadableMap, promise: Promise) {
         if (ReactParamsCheck.checkParams(arrayOf(DEVID), params)) {
             device = getDevice(params.getString(DEVID) as String)
             device?.registerDevListener(object : IDevListener {
