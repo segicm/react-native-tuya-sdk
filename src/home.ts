@@ -1,5 +1,5 @@
 import { NativeModules, Platform } from 'react-native';
-import { DeviceDps } from 'device';
+import { DeviceBean } from './device';
 import { prepareDeviceBean } from './bridgeUtils'
 
 const tuya = NativeModules.TuyaHomeModule;
@@ -33,27 +33,7 @@ export type DeviceSchemaItem = {
   property: string;
   mode: string;
 };
-export type DeviceDetailResponse = {
-  homeId: number;
-  isOnline: boolean;
-  productId: string;
-  devId: string;
-  verSw: string;
-  name: string;
-  dps: DeviceDps;
-  homeDisplayOrder: number;
-  roomId: number;
-  mac: string;
-  ip: string;
-  uuid: string;
-  timezoneId: string;
-  schemaMap: Record<number, DeviceSchemaItem>;
-  productBean: {
-    schemaInfo: {
-      dpCodeSchemaMap: Record<string, DeviceSchemaItem>;
-    };
-  };
-};
+export type DeviceDetailResponse = DeviceBean;
 export type GetHomeDetailResponse = {
   deviceList: DeviceDetailResponse[];
   groupList: any[];
