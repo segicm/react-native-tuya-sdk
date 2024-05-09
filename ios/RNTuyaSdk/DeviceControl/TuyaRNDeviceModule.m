@@ -34,14 +34,11 @@ RCT_EXPORT_MODULE(TuyaDeviceModule)
 RCT_EXPORT_METHOD(registerDevListener:(NSDictionary *)params resolver:(RCTPromiseResolveBlock)resolver rejecter:(RCTPromiseRejectBlock)rejecter) {
 ThingSmartDevice *d = [self smartDeviceWithParams:params];
   if (d == nil) {
-    NSString *appDomain = [[NSBundle mainBundle] bundleIdentifier];
-    NSError *error = [[NSError alloc] initWithDomain:appDomain code:-900 userInfo:@{@"devId is nil": @"Device ID not specified or null"}];
-
-    [TuyaRNUtils rejecterWithError:error handler:rejecter];
-    return;
+      rejecter(@"cannot add device listener", @"devId is nil or not exist", nil);
+  } else {
+      //监听设备
+      [TuyaRNDeviceListener registerDevice:d type:TuyaRNDeviceListenType_DeviceInfo];
   }
-  //监听设备
-  [TuyaRNDeviceListener registerDevice:d type:TuyaRNDeviceListenType_DeviceInfo];
 }
 
 /**
