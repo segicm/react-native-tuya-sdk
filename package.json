@@ -20,8 +20,7 @@
     "build": "tsdx build",
     "test": "tsdx test",
     "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "postinstall": "tsdx build"
+    "prepare": "tsdx build"
   },
   "peerDependencies": {
     "react-native": ">=0.70.5"
