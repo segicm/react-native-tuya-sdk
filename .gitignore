@@ -1,7 +1,7 @@
 build/
-dist/
 */build/
-
+src/*.js*
+src/*.d*
 node_modules/
 
 # OSX
