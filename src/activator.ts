@@ -34,6 +34,7 @@ export interface InitBluetoothActivatorParams {
 
 export interface StartLeScanParams {
   timeout: number;
+  homeId: number;
   scanType:
     | 'SINGLE'
     | 'SINGLE_QR'
@@ -89,6 +90,8 @@ export type StartQRActivatorParams = {
   time: number;
 };
 
+export type ActiveBleParams = {deviceInfo: any, homeId: string};
+
 export async function startQRActivator(params: StartQRActivatorParams): Promise<DeviceDetailResponse> {
   if (Platform.OS === 'ios') {
     const device = await tuya.initActivator({ ...params, type: 'TY_QR' });
@@ -113,6 +116,10 @@ export function startBluetoothScan(params: StartLeScanParams) {
     return tuyaBLEScanner.startBluetoothLEScan();
   }
   return tuya.startBluetoothScan(params);
+}
+
+export function activeBLE({deviceInfo, homeId}: ActiveBleParams) {
+  return tuyaBLEScanner.activeBLE({deviceInfo, homeId});
 }
 
 export async function initBluetoothDualModeActivator(

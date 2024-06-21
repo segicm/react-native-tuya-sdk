@@ -104,3 +104,55 @@ export function getDataPointStat(
 ): Promise<any> {
   return tuya.getDataPointStat(params);
 }
+
+export function getLockMemberList(devId: string): Promise<any> {
+  return tuya.getProLockMemberListWithDevId(devId);
+}
+
+export function getDp(dpId: object): Promise<any> {
+  return tuya.getDp(dpId);
+}
+
+export function checkIsBLEConnected(devId: string): Promise<boolean> {
+  return tuya.checkIsBLEConnected(devId);
+}
+
+export function getProBoundUnlockOpModeListWithDevId(devId: string, userId: string): Promise<boolean> {
+  return tuya.getProBoundUnlockOpModeListWithDevId(devId, userId);
+}
+
+export function isProNeedAllocUnlockOpMode(devId: string): Promise<boolean> {
+  return tuya.isProNeedAllocUnlockOpMode(devId);
+}
+
+export function getProOfflinePasswordWithDevId(devId: string): Promise<boolean> {
+  return tuya.getProOfflinePasswordWithDevId(devId);
+}
+
+export function getLockDynamicPasswordWithSuccess(devId: string): Promise<string> {
+  return tuya.getLockDynamicPasswordWithSuccess(devId);
+}
+
+export function getProUnboundUnlockOpModeListWithDevId(devId: string): Promise<boolean> {
+  return tuya.getProUnboundUnlockOpModeListWithDevId(devId);
+}
+
+export function addMemberWithUserName(devId: string, date: Date): Promise<boolean> {
+  return tuya.addMemberWithUserName(devId, date);
+}
+
+export function getProPasswordListWithDevId(devId: string): Promise<boolean> {
+  return tuya.getProPasswordListWithDevId(devId);
+}
+
+export function checkDeviceConnectionStatus(devId: string): Promise<boolean> {
+  return tuya.checkIsOnline(devId);
+}
+
+export function getProCurrentMemberDetailWithDevId(devId: string): Promise<any> {
+  return tuya.getProCurrentMemberDetailWithDevId(devId);
+}
+
+export function bleManualLockDevice(devId: string): Promise<any> {
+  return tuya.bleManualLockDevice(devId);
+}

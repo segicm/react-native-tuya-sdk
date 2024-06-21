@@ -48,7 +48,9 @@ RCT_EXPORT_MODULE(TuyaEventSender);
 
 - (void)sendEvent2RN:(NSString *)event body:(id)body
 {
+  NSLog(@"sendEvent2RN");
   if (hasListeners) {
+    NSLog(@"sendEvent2RN - HAS LISTENERS");
     [self sendEventWithName:event body:body];
   }
 }
